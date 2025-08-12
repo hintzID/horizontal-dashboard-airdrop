@@ -1,65 +1,101 @@
 body {
-  font-family: Arial, sans-serif;
-  padding: 10px;
-  background: #f4f4f4;
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    background: #f4f4f4;
+}
+
+.tabs {
+    margin-bottom: 10px;
+}
+
+.tab-btn {
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-right: 5px;
+    background: #ddd;
+    border: none;
+    border-radius: 4px;
+}
+
+.tab-btn.active {
+    background: #aaa;
+    color: white;
+}
+
+.tab-content {
+    display: none;
 }
 
 table {
-  border-collapse: collapse;
-  width: 100%;
-  table-layout: fixed;
-  background: white;
+    border-collapse: collapse;
+    width: 100%;
+    background: white;
+    table-layout: fixed;
 }
 
-th, td {
-  border: 1px solid #ccc;
-  padding: 2px 4px;
-  font-size: 13px;
-  line-height: 1.1;
-  vertical-align: middle;
-  word-break: break-word;
-  white-space: normal;
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 2px 4px;
+    font-size: 13px;
+    line-height: 1.1;
+    vertical-align: middle;
+    word-break: break-word;
+    white-space: normal;
 }
 
 th {
-  background: #eee;
-  white-space: nowrap;
+    background: #eee;
 }
 
 td[contenteditable="true"] {
-  background: #fffce0;
-  outline: none;
+    background: #fffce0;
+    outline: none;
 }
 
-th:nth-child(1), td:nth-child(1) {
-  width: 35px;
-  text-align: center;
+th:nth-child(1),
+td:nth-child(1) {
+    width: 35px;
+    text-align: center;
 }
 
-th:nth-child(4), td:nth-child(4) {
-  width: 50px; /* Kolom link dipersempit */
-  text-align: center;
+th:nth-child(4),
+td:nth-child(4) {
+    width: 60px;
+    text-align: center;
 }
 
-th:nth-child(5), td:nth-child(5) {
-  width: 35px;
-  text-align: center;
+th:nth-child(5),
+td:nth-child(5) {
+    width: 35px;
+    text-align: center;
 }
 
-th:nth-child(6), td:nth-child(6) {
-  width: 60px;
-  text-align: center;
+th:nth-child(6),
+td:nth-child(6) {
+    width: 80px;
+    text-align: center;
 }
 
 button {
-  padding: 2px 6px;
-  cursor: pointer;
-  font-size: 12px;
-  border: 1px solid #888;
-  border-radius: 4px;
-  background: #f0f0f0;
+    padding: 2px 6px;
+    cursor: pointer;
+    font-size: 12px;
+    border: 1px solid #888;
+    border-radius: 4px;
+    background: #f0f0f0;
 }
 
 button:hover {
-  background: #e0e0e0;
+    background: #e0e0e0;
+}
+
+.toolbar {
+    margin-bottom: 10px;
+    /* jarak tombol ke tabel */
+}
+
+.toolbar button {
+    margin-right: 5px;
+    /* jarak antar tombol */
 }
