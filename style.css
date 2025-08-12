@@ -1,0 +1,65 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 10px;
+  background: #f4f4f4;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  background: white;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 2px 4px;
+  font-size: 13px;
+  line-height: 1.1;
+  vertical-align: middle;
+  word-break: break-word;
+  white-space: normal;
+}
+
+th {
+  background: #eee;
+  white-space: nowrap;
+}
+
+td[contenteditable="true"] {
+  background: #fffce0;
+  outline: none;
+}
+
+th:nth-child(1), td:nth-child(1) {
+  width: 35px;
+  text-align: center;
+}
+
+th:nth-child(4), td:nth-child(4) {
+  width: 50px; /* Kolom link dipersempit */
+  text-align: center;
+}
+
+th:nth-child(5), td:nth-child(5) {
+  width: 35px;
+  text-align: center;
+}
+
+th:nth-child(6), td:nth-child(6) {
+  width: 60px;
+  text-align: center;
+}
+
+button {
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 12px;
+  border: 1px solid #888;
+  border-radius: 4px;
+  background: #f0f0f0;
+}
+
+button:hover {
+  background: #e0e0e0;
+}
