@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<title>Airdrop Tracker</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 10px; background:#f4f4f4; }
+  table { border-collapse: collapse; width:100%; table-layout: fixed; background:white; }
+  th, td {
+    border:1px solid #ccc;
+    padding:2px 4px;
+    font-size:13px;
+    line-height:1.1;
+    vertical-align:middle;
+    word-break:break-word;
+    white-space:normal;
+  }
+  th { background:#eee; white-space:nowrap; }
+  td[contenteditable="true"] { background:#fffce0; outline:none; }
+  th:nth-child(1), td:nth-child(1){ width:35px; text-align:center; }
+  th:nth-child(4), td:nth-child(4){ width:60px; text-align:center; }
+  th:nth-child(5), td:nth-child(5){ width:35px; text-align:center; }
+  th:nth-child(6), td:nth-child(6){ width:60px; text-align:center; }
+  button {
+    padding:2px 6px;
+    cursor:pointer;
+    font-size:12px;
+    border:1px solid #888;
+    border-radius:4px;
+    background:#f0f0f0;
+  }
+  button:hover { background:#e0e0e0; }
+</style>
+</head>
+<body>
+
+<h2>Airdrop Tracker</h2>
+<button onclick="addRow()">Tambah Data</button>
+<button id="resetChecklist">Reset Checklist</button>
+<br><br>
+
+<table id="airdropTable">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nama Airdrop</th>
+      <th>Deskripsi</th>
+      <th>Link</th>
+      <th>✓</th>
+      <th>Aksi</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+let data = [];
+try {
+  data = JSON.parse(localStorage.getItem('airdropData') || '[]');
+  if (!Array.isArray(data)) data = [];
+} catch(e) {
+  data = [];
+}
+
+function saveTable(){
+  localStorage.setItem('airdropData', JSON.stringify(data));
+}
+
+function setLink(index, url){
+  if (data[index]) {
+    data[index].link = url || '';
+    saveTable();
+    renderTable();
+  }
+}
+
+function renderTable(){
+  const tbody = document.querySelector('#airdropTable tbody');
+  tbody.innerHTML = '';
+  data.forEach((row, i) => {
+    const tr = document.createElement('tr');
+
+    // ID
+    const tdId = document.createElement('td');
+    tdId.textContent = i + 1;
+    tr.appendChild(tdId);
+
+    // Nama
+    const tdNama = document.createElement('td');
+    tdNama.contentEditable = "true";
+    tdNama.innerText = row.nama || '';
+    tdNama.oninput = () => { data[i].nama = tdNama.innerText.trim(); saveTable(); };
+    tr.appendChild(tdNama);
+
+    // Deskripsi
+    const tdDesc = document.createElement('td');
+    tdDesc.contentEditable = "true";
+    tdDesc.innerText = row.deskripsi || '';
+    tdDesc.oninput = () => { data[i].deskripsi = tdDesc.innerText.trim(); saveTable(); };
+    tr.appendChild(tdDesc);
+
+    // Link
+    const tdLink = document.createElement('td');
+    const btnLink = document.createElement('button');
+
+    if (row.link) {
+      btnLink.textContent = "🔗";
+      btnLink.title = "Klik untuk buka, Shift+Klik untuk edit";
+      btnLink.onclick = (e) => {
+        if (e.shiftKey) {
+          const url = prompt("Edit Link:", row.link);
+          if (url !== null) setLink(i, url.trim());
+        } else {
+          window.open(row.link, "_blank");
+        }
+      };
+    } else {
+      btnLink.textContent = "+";
+      btnLink.title = "Atur Link";
+      btnLink.onclick = () => {
+        const url = prompt("Masukkan Link:", '');
+        if (url !== null) setLink(i, url.trim());
+      };
+    }
+    tdLink.appendChild(btnLink);
+    tr.appendChild(tdLink);
+
+    // Checklist
+    const tdCheck = document.createElement('td');
+    const check = document.createElement('input');
+    check.type = 'checkbox';
+    check.checked = row.checklist || false;
+    check.onchange = e => { data[i].checklist = e.target.checked; saveTable(); };
+    tdCheck.appendChild(check);
+    tr.appendChild(tdCheck);
+
+    // Aksi
+    const tdAksi = document.createElement('td');
+    const btnHapus = document.createElement('button');
+    btnHapus.textContent = "🗑";
+    btnHapus.title = "Hapus Baris";
+    btnHapus.onclick = () => { data.splice(i,1); saveTable(); renderTable(); };
+    tdAksi.appendChild(btnHapus);
+    tr.appendChild(tdAksi);
+
+    tbody.appendChild(tr);
+  });
+}
+
+function addRow(){
+  data.push({ nama:'', deskripsi:'', link:'', checklist:false });
+  saveTable();
+  renderTable();
+}
+
+document.getElementById('resetChecklist').onclick = () => {
+  data.forEach(r => r.checklist = false);
+  saveTable();
+  renderTable();
+};
+
+renderTable();
+</script>
+</body>
+</html>
