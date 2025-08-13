@@ -1,199 +1,143 @@
-// ===== KONFIGURASI GOOGLE API =====
+// ====== KONFIGURASI GOOGLE API ======
 const CLIENT_ID = "123146255469-kbddr3ni88jj9i92b3hjjg32os13qn3j.apps.googleusercontent.com";
-const API_KEY = ""; // Bisa dikosongkan kalau cuma OAuth
+const API_KEY = "AIzaSyAsGL6J2EOFi35rtgiuMk0wKZUbwNbZjYE"; // kosongkan kalau tidak pakai API key
 const SCOPES = "https://www.googleapis.com/auth/drive.file";
 
-let authInstance;
-let dataFileId = null;
-let tableData = [];
+let tokenClient;
+let gapiInited = false;
+let gisInited = false;
+let accessToken = null;
+let fileId = null;
 
-// ===== INISIALISASI GOOGLE API =====
-function initClient() {
-  gapi.client
-    .init({
-      apiKey: API_KEY,
-      clientId: CLIENT_ID,
-      scope: SCOPES,
-      discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
-    })
-    .then(() => {
-      authInstance = gapi.auth2.getAuthInstance();
-      authInstance.isSignedIn.listen(updateSigninStatus);
-      updateSigninStatus(authInstance.isSignedIn.get());
-    });
+// ====== ELEMENT ======
+const signInBtn = document.getElementById("googleSignInBtn");
+const userInfo = document.getElementById("userInfo");
+
+// ====== INISIALISASI GOOGLE API ======
+function gapiLoaded() {
+  gapi.load("client", initializeGapiClient);
 }
 
-function handleClientLoad() {
-  gapi.load("client:auth2", initClient);
+async function initializeGapiClient() {
+  await gapi.client.init({
+    apiKey: API_KEY,
+    discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+  });
+  gapiInited = true;
+  maybeEnableSignin();
 }
 
-// ===== UPDATE STATUS LOGIN =====
-function updateSigninStatus(isSignedIn) {
-  const statusElem = document.getElementById("loginStatus");
-  const loginBtn = document.getElementById("loginBtn");
-  const logoutBtn = document.getElementById("logoutBtn");
+function gisLoaded() {
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    callback: (resp) => {
+      if (resp.access_token) {
+        accessToken = resp.access_token;
+        localStorage.setItem("googleAccessToken", accessToken);
+        loadUserInfo();
+      }
+    },
+  });
+  gisInited = true;
+  maybeEnableSignin();
+}
 
-  if (isSignedIn) {
-    const profile = authInstance.currentUser.get().getBasicProfile();
-    statusElem.textContent = "Login sebagai: " + profile.getName();
-    loginBtn.style.display = "none";
-    logoutBtn.style.display = "inline-block";
-
-    loadDataFromDrive();
-  } else {
-    statusElem.textContent = "Belum login";
-    loginBtn.style.display = "inline-block";
-    logoutBtn.style.display = "none";
+function maybeEnableSignin() {
+  if (gapiInited && gisInited) {
+    const savedToken = localStorage.getItem("googleAccessToken");
+    if (savedToken) {
+      accessToken = savedToken;
+      loadUserInfo();
+    }
   }
 }
 
-// ===== LOGIN & LOGOUT =====
-function handleLogin() {
-  authInstance.signIn();
+// ====== LOGIN GOOGLE ======
+signInBtn.addEventListener("click", () => {
+  tokenClient.requestAccessToken({ prompt: "" });
+});
+
+function loadUserInfo() {
+  gapi.client.request({
+    path: "https://www.googleapis.com/oauth2/v2/userinfo",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  }).then((res) => {
+    const profile = res.result;
+    userInfo.textContent = `Halo, ${profile.name}`;
+    signInBtn.style.display = "none";
+    autoLoadData();
+  });
 }
 
-function handleLogout() {
-  authInstance.signOut();
+// ====== SIMPAN & MUAT DATA ======
+function autoLoadData() {
+  gapi.client.drive.files.list({
+    q: "name='airdropsData.json' and trashed=false",
+    spaces: "drive",
+    fields: "files(id, name)",
+  }).then((res) => {
+    if (res.result.files && res.result.files.length > 0) {
+      fileId = res.result.files[0].id;
+      gapi.client.drive.files.get({
+        fileId: fileId,
+        alt: "media"
+      }).then((file) => {
+        const data = JSON.parse(file.body);
+        renderTable(data);
+      });
+    } else {
+      saveData([]);
+    }
+  });
 }
 
-// ===== MENCARI FILE DI DRIVE =====
-function loadDataFromDrive() {
-  gapi.client.drive.files
-    .list({
-      q: "name='airdrop_data.json' and trashed=false",
-      spaces: "drive",
-    })
-    .then((response) => {
-      const files = response.result.files;
-      if (files && files.length > 0) {
-        dataFileId = files[0].id;
-        downloadFile(dataFileId);
-      } else {
-        tableData = [];
-        renderTable();
-      }
-    });
-}
-
-// ===== DOWNLOAD FILE JSON =====
-function downloadFile(fileId) {
-  gapi.client.drive.files
-    .get({
-      fileId: fileId,
-      alt: "media",
-    })
-    .then((res) => {
-      try {
-        tableData = JSON.parse(res.body);
-      } catch {
-        tableData = [];
-      }
-      renderTable();
-    });
-}
-
-// ===== SIMPAN FILE KE DRIVE =====
-function saveDataToDrive() {
-  const fileContent = JSON.stringify(tableData);
+function saveData(data) {
+  const fileContent = JSON.stringify(data);
   const file = new Blob([fileContent], { type: "application/json" });
   const metadata = {
-    name: "airdrop_data.json",
-    mimeType: "application/json",
+    name: "airdropsData.json",
+    mimeType: "application/json"
   };
 
-  if (dataFileId) {
-    // Update file
-    gapi.client.request({
-      path: `/upload/drive/v3/files/${dataFileId}`,
-      method: "PATCH",
-      params: { uploadType: "media" },
-      body: fileContent,
-    });
-  } else {
-    // Buat file baru
+  if (!fileId) {
     const form = new FormData();
-    form.append(
-      "metadata",
-      new Blob([JSON.stringify(metadata)], { type: "application/json" })
-    );
+    form.append("metadata", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
     form.append("file", file);
-
     fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
       method: "POST",
-      headers: new Headers({ Authorization: "Bearer " + gapi.auth.getToken().access_token }),
-      body: form,
-    })
-      .then((res) => res.json())
-      .then((val) => {
-        dataFileId = val.id;
-      });
+      headers: new Headers({ Authorization: "Bearer " + accessToken }),
+      body: form
+    }).then(res => res.json()).then(file => {
+      fileId = file.id;
+    });
+  } else {
+    fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
+      method: "PATCH",
+      headers: {
+        Authorization: "Bearer " + accessToken,
+        "Content-Type": "application/json"
+      },
+      body: fileContent
+    });
   }
 }
 
-// ===== RENDER TABEL =====
-function renderTable() {
-  const tbody = document.querySelector("#mainTable tbody");
+// ====== RENDER TABEL (Contoh) ======
+function renderTable(data) {
+  const tbody = document.querySelector("#airdropTable tbody");
   tbody.innerHTML = "";
-  tableData.forEach((row, idx) => {
+  data.forEach((row) => {
     const tr = document.createElement("tr");
-
     tr.innerHTML = `
-      <td contenteditable="true">${row.name || ""}</td>
-      <td contenteditable="true">${row.category || ""}</td>
-      <td><input type="checkbox" ${row.checked ? "checked" : ""}></td>
-      <td class="links">${renderLinks(row.links || {})}</td>
-      <td contenteditable="true">${row.notes || ""}</td>
-      <td>
-        <button onclick="deleteRow(${idx})">🗑️</button>
-      </td>
+      <td>${row.name}</td>
+      <td>${row.date}</td>
+      <td>${row.status}</td>
     `;
-
-    tr.querySelectorAll("[contenteditable]").forEach((cell, cIdx) => {
-      cell.addEventListener("input", () => {
-        if (cIdx === 0) row.name = cell.textContent.trim();
-        if (cIdx === 1) row.category = cell.textContent.trim();
-        if (cIdx === 4) row.notes = cell.textContent.trim();
-        saveDataToDrive();
-      });
-    });
-
-    tr.querySelector("input[type=checkbox]").addEventListener("change", (e) => {
-      row.checked = e.target.checked;
-      saveDataToDrive();
-    });
-
     tbody.appendChild(tr);
   });
 }
 
-// ===== BUAT LINK ICONS =====
-function renderLinks(links) {
-  const icons = {
-    utama: "🌐",
-    discord: "💜",
-    x: "𝕏",
-    tele: "📱",
-    custom1: "🔗",
-    custom2: "🔗"
-  };
-
-  return Object.keys(icons)
-    .map((k) => {
-      const hasLink = links[k];
-      return `<button ${hasLink ? `onclick="window.open('${links[k]}')"` : ""} class="${hasLink ? "" : "empty"}">${icons[k]}</button>`;
-    })
-    .join("");
-}
-
-// ===== TAMBAH & HAPUS ROW =====
-function addRow() {
-  tableData.push({ name: "", category: "", checked: false, links: {}, notes: "" });
-  renderTable();
-  saveDataToDrive();
-}
-
-function deleteRow(idx) {
-  tableData.splice(idx, 1);
-  renderTable();
-  saveDataToDrive();
-}
+// ====== LOAD SCRIPT GOOGLE ======
+document.write('<script src="https://apis.google.com/js/api.js?onload=gapiLoaded"></script>');
+document.write('<script src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>');

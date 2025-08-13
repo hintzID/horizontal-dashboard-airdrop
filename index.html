@@ -1,495 +1,95 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Airdrop Tracker — Drive Sync</title>
-
-<!-- Styles (rapat, responsive) -->
-<style>
-:root{--accent:#0088ff;--muted:#ccc;--ui-bg:#f4f4f4}
-body{font-family:Arial,Helvetica,sans-serif;background:var(--ui-bg);margin:0;color:#111}
-.topbar{display:flex;justify-content:space-between;align-items:center;background:#222;color:#fff;padding:8px;gap:8px;flex-wrap:wrap}
-.nav{display:flex;gap:6px}
-.nav button{background:#444;color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer}
-.nav button.active{background:var(--accent)}
-.auth{display:flex;align-items:center;gap:8px}
-.auth .status{color:#fff;font-size:13px}
-
-/* main layout */
-.container{padding:10px}
-.tab-content{display:none;padding-top:6px}
-.tab-content.active{display:block}
-.actions{margin-bottom:10px}
-.actions button{background:var(--accent);color:#fff;border:0;padding:6px 10px;margin-right:6px;border-radius:6px;cursor:pointer}
-.actions button[disabled]{background:#ccc;cursor:not-allowed}
-
-/* table */
-.table-container{overflow-x:auto;background:#fff;padding:6px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-table{width:100%;border-collapse:collapse;background:#fff}
-th,td{border:1px solid #e6e6e6;padding:6px 8px;font-size:13px;vertical-align:middle}
-td[contenteditable="true"]{background:#fbfbf8}
-th:nth-child(3),td:nth-child(3){width:60px;text-align:center} /* checklist */
-th:nth-child(4),td:nth-child(4){width:150px;text-align:center;white-space:nowrap} /* links */
-th:nth-child(6),td:nth-child(6){width:80px;text-align:center;white-space:nowrap;padding:4px 6px} /* aksi */
-
-/* links icons */
-.links button{background:none;border:0;cursor:pointer;font-size:16px;margin:0 3px;padding:2px 5px;line-height:1;vertical-align:middle}
-.links button.empty{opacity:.35}
-.links button:hover{transform:scale(1.15);transition:transform .12s}
-
-/* action buttons inside table */
-td:nth-child(6) button{background:#f3f3f3;border:1px solid #d0d0d0;padding:4px 6px;border-radius:4px;cursor:pointer}
-td:nth-child(6) button:hover{background:#eee}
-
-/* responsive tweak */
-@media (max-width:640px){
-  .nav{flex-wrap:wrap}
-  th,td{font-size:12px;padding:5px}
-}
-</style>
-
-<!-- Google libs -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://apis.google.com/js/api.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horizontal ARDP</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
+
 <body>
-
-<!-- Top bar -->
-<header class="topbar">
-  <div class="nav" role="navigation" aria-label="tabs">
-    <button class="tab-btn active" data-tab="aktif">📋 Utama</button>
-    <button class="tab-btn" data-tab="raffle">🎟 Airdrop Raffle</button>
-    <button class="tab-btn" data-tab="selesai">✅ Airdrop Selesai</button>
+  <div class="nav">
+    <button data-tab="utama" class="active">Airdrop Utama</button>
+    <button data-tab="raffle">Airdrop Raffle</button>
+    <button data-tab="selesai">Airdrop Selesai</button>
+    <div class="google-login">
+      <button id="googleSignInBtn">🔑 Login Google</button>
+      <span id="userInfo"></span>
+    </div>
   </div>
 
-  <div class="auth">
-    <span class="status" id="authStatus">Belum login</span>
-    <button id="btn-login" style="display:none">Login Google</button>
-    <button id="btn-logout" style="display:none">Logout</button>
+  <!-- Tab Utama -->
+  <div id="utama" class="tab-content active">
+    <div class="actions">
+      <button id="addDataUtama">Tambah Data</button>
+      <button id="resetChecklistUtama">Reset Checklist</button>
+    </div>
+    <div class="table-container">
+      <table id="tableUtama">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Catatan</th>
+            <th>Deadline</th>
+            <th>Link</th>
+            <th>Checklist</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
-</header>
 
-<!-- Main -->
-<main class="container">
-  <!-- Aktif -->
-  <section id="aktif" class="tab-content active">
+  <!-- Tab Raffle -->
+  <div id="raffle" class="tab-content">
     <div class="actions">
-      <button id="add-aktif">➕ Tambah Data</button>
-      <button id="reset-aktif">🔄 Reset Checklist</button>
+      <button id="addDataRaffle">Tambah Data</button>
+      <button id="resetChecklistRaffle">Reset Checklist</button>
     </div>
     <div class="table-container">
-      <table id="table-aktif">
+      <table id="tableRaffle">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Deskripsi</th>
-            <th>✓</th>
-            <th>Links</th>
-            <th>Tanggal</th>
+            <th>Catatan</th>
+            <th>Deadline</th>
+            <th>Link</th>
+            <th>Checklist</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-  </section>
+  </div>
 
-  <!-- Raffle -->
-  <section id="raffle" class="tab-content">
+  <!-- Tab Selesai -->
+  <div id="selesai" class="tab-content">
     <div class="actions">
-      <button id="add-raffle">➕ Tambah Data</button>
-      <button id="reset-raffle">🔄 Reset Checklist</button>
+      <button id="addDataSelesai" disabled>Tambah Data</button>
+      <button id="resetChecklistSelesai" disabled>Reset Checklist</button>
     </div>
     <div class="table-container">
-      <table id="table-raffle">
+      <table id="tableSelesai">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Deskripsi</th>
-            <th>✓</th>
-            <th>Links</th>
-            <th>Tanggal</th>
+            <th>Catatan</th>
+            <th>Deadline</th>
+            <th>Link</th>
+            <th>Checklist</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-  </section>
+  </div>
 
-  <!-- Selesai -->
-  <section id="selesai" class="tab-content">
-    <div class="actions">
-      <button disabled>➕ Tambah Data</button>
-      <button disabled>🔄 Reset Checklist</button>
-    </div>
-    <div class="table-container">
-      <table id="table-selesai">
-        <thead>
-          <tr>
-            <th>Nama</th>
-            <th>Deskripsi</th>
-            <th>✓</th>
-            <th>Links</th>
-            <th>Tanggal</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </section>
-</main>
-
-<!-- Script: dashboard + Google Drive sync -->
-<script>
-/* ====== KONFIGURASI ====== */
-const CLIENT_ID = "123146255469-kbddr3ni88jj9i92b3hjjg32os13qn3j.apps.googleusercontent.com"; // dari kamu
-const API_KEY = "AIzaSyAsGL6J2EOFi35rtgiuMk0wKZUbwNbZjYE"; // GANTI dengan API Keymu (atau kosong jika tidak mau pakai)
-const SCOPES = "https://www.googleapis.com/auth/drive.file";
-const DRIVE_FILENAME = "horizontalARDP.json"; // nama file di Drive
-const AUTOSAVE_DELAY = 1000; // ms debounced
-
-/* ====== STATE ====== */
-let tokenClient = null;
-let accessToken = null;
-let gapiInited = false;
-let gisInited = false;
-let driveFileId = null;
-let autosaveTimer = null;
-
-/* Data model per user (di-drive). Struktur: { aktif:[], raffle:[], selesai:[] } */
-let dataStore = { aktif: [], raffle: [], selesai: [] };
-
-/* ====== Utility: debounce autosave ====== */
-function scheduleSave() {
-  if (autosaveTimer) clearTimeout(autosaveTimer);
-  autosaveTimer = setTimeout(() => {
-    saveToDrive();
-  }, AUTOSAVE_DELAY);
-}
-
-/* ====== UI: Tabs ====== */
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const tab = btn.dataset.tab;
-    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-  });
-});
-
-/* ====== UI: Auth status buttons ====== */
-const authStatusEl = document.getElementById('authStatus');
-const btnLogin = document.getElementById('btn-login');
-const btnLogout = document.getElementById('btn-logout');
-
-btnLogin.addEventListener('click', () => {
-  if (tokenClient) tokenClient.requestAccessToken({ prompt: 'consent' });
-});
-btnLogout.addEventListener('click', () => {
-  if (accessToken) {
-    google.accounts.oauth2.revoke(accessToken, () => {});
-  }
-  accessToken = null;
-  driveFileId = null;
-  gapi.client.setToken({ access_token: null });
-  updateAuthUI(false);
-});
-
-/* ====== Init gapi & gis ====== */
-function gapiLoaded() {
-  gapi.load('client', initializeGapiClient);
-}
-
-async function initializeGapiClient() {
-  await gapi.client.init({
-    apiKey: API_KEY || undefined,
-    discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
-  });
-  gapiInited = true;
-  maybeAutoAuth();
-}
-
-function gisLoaded() {
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPES,
-    callback: (resp) => {
-      accessToken = resp && resp.access_token ? resp.access_token : null;
-      if (accessToken) {
-        gapi.client.setToken({ access_token: accessToken });
-        updateAuthUI(true);
-        loadOrCreateFileAndLoadData();
-      } else {
-        updateAuthUI(false);
-      }
-    },
-  });
-  gisInited = true;
-  maybeAutoAuth();
-}
-
-/* try silent auth when both libs ready */
-function maybeAutoAuth() {
-  if (!gapiInited || !gisInited) return;
-  // first try silent
-  tokenClient.requestAccessToken({ prompt: '' });
-}
-
-/* update auth UI */
-function updateAuthUI(signedIn) {
-  if (signedIn) {
-    // get email if possible
-    fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + accessToken } })
-      .then(r => r.json())
-      .then(info => { authStatusEl.textContent = 'Login: ' + (info.email || info.name || 'User'); })
-      .catch(()=> { authStatusEl.textContent = 'Login'; });
-    btnLogin.style.display = 'none';
-    btnLogout.style.display = '';
-  } else {
-    authStatusEl.textContent = 'Belum login';
-    btnLogin.style.display = '';
-    btnLogout.style.display = 'none';
-  }
-}
-
-/* ====== Drive helpers ====== */
-async function findDriveFileIdByName(name) {
-  const res = await gapi.client.drive.files.list({
-    q: `name='${name.replace(/'/g,"\\'")}' and trashed=false`,
-    fields: 'files(id, name)',
-    spaces: 'drive',
-    pageSize: 1
-  });
-  const files = res.result.files || [];
-  return files.length ? files[0].id : null;
-}
-
-async function createDriveFile(name, contentObj) {
-  const content = JSON.stringify(contentObj || { aktif:[], raffle:[], selesai:[] });
-  const metadata = { name: name, mimeType: 'application/json' };
-
-  const form = new FormData();
-  form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-  form.append('file', new Blob([content], { type: 'application/json' }));
-
-  const resp = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-    method: 'POST',
-    headers: { Authorization: 'Bearer ' + accessToken },
-    body: form
-  });
-  const json = await resp.json();
-  return json.id;
-}
-
-async function downloadDriveFile(fileId) {
-  const resp = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
-    headers: { Authorization: 'Bearer ' + accessToken }
-  });
-  if (!resp.ok) throw new Error('failed');
-  return await resp.json();
-}
-
-async function updateDriveFile(fileId, contentObj) {
-  const content = JSON.stringify(contentObj || { aktif:[], raffle:[], selesai:[] });
-  // PATCH with uploadType=media
-  await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`, {
-    method: 'PATCH',
-    headers: { Authorization: 'Bearer ' + accessToken, 'Content-Type': 'application/json' },
-    body: content
-  });
-}
-
-/* ====== Load or create file, then populate UI ====== */
-async function loadOrCreateFileAndLoadData() {
-  try {
-    driveFileId = await findDriveFileIdByName(DRIVE_FILENAME);
-    if (!driveFileId) {
-      driveFileId = await createDriveFile(DRIVE_FILENAME, { aktif:[], raffle:[], selesai:[] });
-      dataStore = { aktif:[], raffle:[], selesai:[] };
-    } else {
-      const json = await downloadDriveFile(driveFileId);
-      // basic validation: ensure arrays exist
-      dataStore.aktif = Array.isArray(json.aktif) ? json.aktif : [];
-      dataStore.raffle = Array.isArray(json.raffle) ? json.raffle : [];
-      dataStore.selesai = Array.isArray(json.selesai) ? json.selesai : [];
-    }
-    renderAll();
-  } catch (err) {
-    updateAuthUI(false);
-  }
-}
-
-/* ====== Save to Drive (debounced) ====== */
-async function saveToDrive() {
-  if (!accessToken) return;
-  if (!driveFileId) {
-    driveFileId = await createDriveFile(DRIVE_FILENAME, dataStore);
-    return;
-  }
-  await updateDriveFile(driveFileId, dataStore);
-}
-
-/* ====== Rendering & UI bindings ====== */
-function renderAll() {
-  renderTable('aktif','table-aktif', dataStore.aktif);
-  renderTable('raffle','table-raffle', dataStore.raffle);
-  renderTable('selesai','table-selesai', dataStore.selesai);
-}
-
-function guardLinks(obj) {
-  if (!obj) return { main:'', discord:'', x:'', telegram:'', custom1:'', custom2:'' };
-  return {
-    main: obj.main || '',
-    discord: obj.discord || '',
-    x: obj.x || '',
-    telegram: obj.telegram || '',
-    custom1: obj.custom1 || '',
-    custom2: obj.custom2 || ''
-  };
-}
-
-function renderTable(key, tableId, arr) {
-  const tbody = document.querySelector('#' + tableId + ' tbody');
-  tbody.innerHTML = '';
-  arr.forEach((row, i) => {
-    if (!row.links) row.links = guardLinks(row.links);
-    const tr = document.createElement('tr');
-
-    // Nama
-    const tdName = document.createElement('td');
-    tdName.contentEditable = 'true';
-    tdName.innerText = row.nama || '';
-    tdName.addEventListener('input', () => {
-      row.nama = tdName.innerText.trim();
-      scheduleSave();
-    });
-    tr.appendChild(tdName);
-
-    // Deskripsi
-    const tdDesc = document.createElement('td');
-    tdDesc.contentEditable = 'true';
-    tdDesc.innerText = row.deskripsi || '';
-    tdDesc.addEventListener('input', () => {
-      row.deskripsi = tdDesc.innerText.trim();
-      scheduleSave();
-    });
-    tr.appendChild(tdDesc);
-
-    // Checklist
-    const tdCheck = document.createElement('td');
-    const chk = document.createElement('input');
-    chk.type = 'checkbox';
-    chk.checked = !!row.checklist;
-    chk.addEventListener('change', () => {
-      row.checklist = chk.checked;
-      scheduleSave();
-    });
-    tdCheck.appendChild(chk);
-    tr.appendChild(tdCheck);
-
-    // Links
-    const tdLinks = document.createElement('td');
-    tdLinks.className = 'links';
-    const linksOrder = [
-      ['main','🔗'],
-      ['discord','🟣'],
-      ['x','𝕏'],
-      ['telegram','📨'],
-      ['custom1','🌐'],
-      ['custom2','📄']
-    ];
-    linksOrder.forEach(([k, emoji]) => {
-      const btn = document.createElement('button');
-      btn.textContent = emoji;
-      if (!row.links[k]) btn.classList.add('empty');
-      btn.title = row.links[k] ? `${k} (Klik buka, Shift+Klik edit)` : `${k} (Klik untuk atur)`;
-      btn.addEventListener('click', (e) => {
-        if (row.links[k] && !e.shiftKey) {
-          window.open(row.links[k], '_blank');
-          return;
-        }
-        const v = prompt(`Masukkan link ${k}:`, row.links[k] || '');
-        if (v === null) return;
-        row.links[k] = v.trim();
-        if (!row.links[k]) btn.classList.add('empty'); else btn.classList.remove('empty');
-        scheduleSave();
-      });
-      tdLinks.appendChild(btn);
-    });
-    tr.appendChild(tdLinks);
-
-    // Tanggal (bisa pakai createdAt)
-    const tdDate = document.createElement('td');
-    tdDate.contentEditable = 'true';
-    tdDate.innerText = row.tanggal || '';
-    tdDate.addEventListener('input', () => {
-      row.tanggal = tdDate.innerText.trim();
-      scheduleSave();
-    });
-    tr.appendChild(tdDate);
-
-    // Aksi
-    const tdAksi = document.createElement('td');
-    if (key === 'aktif' || key === 'raffle') {
-      const doneBtn = document.createElement('button');
-      doneBtn.textContent = '✅';
-      doneBtn.title = 'Pindahkan ke Selesai';
-      doneBtn.addEventListener('click', () => {
-        dataStore.selesai.push(row);
-        dataStore[key].splice(i,1);
-        renderAll();
-        scheduleSave();
-      });
-      tdAksi.appendChild(doneBtn);
-    }
-    const delBtn = document.createElement('button');
-    delBtn.textContent = '🗑';
-    delBtn.title = 'Hapus';
-    delBtn.addEventListener('click', () => {
-      dataStore[key].splice(i,1);
-      renderAll();
-      scheduleSave();
-    });
-    tdAksi.appendChild(delBtn);
-    tr.appendChild(tdAksi);
-
-    tbody.appendChild(tr);
-  });
-}
-
-/* ====== Actions: add/reset ====== */
-document.getElementById('add-aktif').addEventListener('click', () => {
-  dataStore.aktif.push({ nama:'', deskripsi:'', links:{}, checklist:false, tanggal:'' });
-  renderAll(); scheduleSave();
-});
-document.getElementById('add-raffle').addEventListener('click', () => {
-  dataStore.raffle.push({ nama:'', deskripsi:'', links:{}, checklist:false, tanggal:'' });
-  renderAll(); scheduleSave();
-});
-document.getElementById('reset-aktif').addEventListener('click', () => {
-  dataStore.aktif.forEach(r=>r.checklist=false); renderAll(); scheduleSave();
-});
-document.getElementById('reset-raffle').addEventListener('click', () => {
-  dataStore.raffle.forEach(r=>r.checklist=false); renderAll(); scheduleSave();
-});
-
-/* ====== Start up: wire Google libs when ready ====== */
-window.onload = () => {
-  // If gapi loaded already, run loader
-  if (window.gapi) gapiLoaded();
-  if (window.google && google.accounts) gisLoaded();
-  // Watch for libs if loaded after onload
-  const libCheckInterval = setInterval(() => {
-    if (!gapiInited && window.gapi) { gapiLoaded(); clearInterval(libCheckInterval); }
-  }, 300);
-  const gisCheckInterval = setInterval(() => {
-    if (!gisInited && window.google && google.accounts) { gisLoaded(); clearInterval(gisCheckInterval); }
-  }, 300);
-};
-</script>
+  <script src="script.js"></script>
 </body>
+
 </html>

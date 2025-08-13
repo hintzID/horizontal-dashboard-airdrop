@@ -5,19 +5,12 @@ body {
   padding: 0;
 }
 
-/* Top Navigation & Auth */
-.topbar {
-  background: #222;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px;
-}
-
 .nav {
+  background: #222;
+  padding: 5px;
   display: flex;
   gap: 5px;
+  align-items: center;
 }
 
 .nav button {
@@ -26,23 +19,39 @@ body {
   border: none;
   padding: 8px 12px;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .nav button.active {
   background: #0088ff;
 }
 
-.auth {
+.google-login {
+  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-#loginStatus {
+#googleSignInBtn {
+  background: white;
+  color: #444;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#googleSignInBtn:hover {
+  background: #f0f0f0;
+}
+
+#userInfo {
+  color: #fff;
   font-size: 14px;
 }
 
-/* Tab Content */
 .tab-content {
   display: none;
   padding: 10px;
@@ -52,7 +61,6 @@ body {
   display: block;
 }
 
-/* Actions */
 .actions {
   margin-bottom: 10px;
 }
@@ -64,6 +72,7 @@ body {
   padding: 6px 10px;
   margin-right: 5px;
   cursor: pointer;
+  border-radius: 4px;
 }
 
 .actions button[disabled] {
@@ -71,7 +80,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Table */
 .table-container {
   overflow-x: auto;
 }
@@ -82,7 +90,8 @@ table {
   background: white;
 }
 
-th, td {
+th,
+td {
   border: 1px solid #ddd;
   padding: 6px;
   text-align: left;
@@ -92,29 +101,29 @@ td[contenteditable="true"] {
   background: #f9f9f9;
 }
 
-/* Column Sizing */
-th:nth-child(3),
-td:nth-child(3) {
-  width: 60px; /* Checklist lebih ngepres */
-  text-align: center;
-}
-
+/* Lebar kolom yang di-press */
 th:nth-child(4),
 td:nth-child(4) {
-  width: 140px; /* Kolom Links lebih rapat */
+  width: 100px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+  width: 80px;
   text-align: center;
   white-space: nowrap;
 }
 
 th:nth-child(6),
 td:nth-child(6) {
-  width: 70px; /* Aksi lebih rapat */
+  width: 90px;
   text-align: center;
   white-space: nowrap;
   padding: 4px 6px;
 }
 
-/* Link Icons */
 .links button {
   background: none;
   border: none;
