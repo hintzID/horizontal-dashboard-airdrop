@@ -1,3 +1,4 @@
+/* Layout dasar */
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
@@ -5,34 +6,44 @@ body {
   padding: 0;
 }
 
-.nav {
-  background: #222;
-  padding: 5px;
+.topbar {
   display: flex;
-  gap: 5px;
+  justify-content: space-between;
+  align-items: center;
+  background: #222;
+  color: #fff;
+  padding: 6px 8px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
+
+.nav { display: flex; gap: 5px; }
 .nav button {
   background: #444;
   color: white;
   border: none;
   padding: 8px 12px;
   cursor: pointer;
+  border-radius: 4px;
 }
-.nav button.active {
+.nav button.active { background: #0088ff; }
+
+.auth { display: flex; align-items: center; gap: 6px; }
+.auth button {
   background: #0088ff;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
 }
+#btn-load, #btn-save { background: #00a86b; }
+#btn-save { background: #0d6efd; }
 
-.tab-content {
-  display: none;
-  padding: 10px;
-}
-.tab-content.active {
-  display: block;
-}
+.tab-content { display: none; padding: 10px; }
+.tab-content.active { display: block; }
 
-.actions {
-  margin-bottom: 10px;
-}
+.actions { margin: 8px 0 10px; }
 .actions button {
   background: #0088ff;
   color: white;
@@ -40,16 +51,13 @@ body {
   padding: 6px 10px;
   margin-right: 5px;
   cursor: pointer;
+  border-radius: 4px;
 }
-.actions button[disabled] {
-  background: #ccc;
-  cursor: not-allowed;
-}
+.actions button[disabled] { background: #ccc; cursor: not-allowed; }
 
-.table-container {
-  overflow-x: auto;
-}
+.table-container { overflow-x: auto; }
 
+/* Tabel */
 table {
   border-collapse: collapse;
   width: 100%;
@@ -59,34 +67,25 @@ th, td {
   border: 1px solid #ddd;
   padding: 6px;
   text-align: left;
+  vertical-align: middle;
 }
+td[contenteditable="true"] { background: #f9f9f9; }
 
-td[contenteditable="true"] {
-  background: #f9f9f9;
-}
-
-/* Lebar kolom Link (4) */
-th:nth-child(4),
-td:nth-child(4) {
-  width: 130px;
+/* Lebar kolom link/checklist/aksi: ngepres */
+th:nth-child(4), td:nth-child(4) {
+  width: 130px;              /* Links */
   text-align: center;
   white-space: nowrap;
   padding: 2px 4px;
 }
-
-/* Lebar kolom Checklist (5) */
-th:nth-child(5),
-td:nth-child(5) {
-  width: 40px;
+th:nth-child(5), td:nth-child(5) {
+  width: 40px;               /* Checklist */
   text-align: center;
   white-space: nowrap;
   padding: 2px 4px;
 }
-
-/* Lebar kolom Aksi (6) */
-th:nth-child(6),
-td:nth-child(6) {
-  width: 80px;
+th:nth-child(6), td:nth-child(6) {
+  width: 80px;               /* Aksi */
   text-align: center;
   white-space: nowrap;
   padding: 2px 6px;
@@ -103,12 +102,18 @@ td:nth-child(6) {
   vertical-align: middle;
   line-height: 1;
 }
-
-.links button.empty {
-  opacity: 0.4;
-}
-
+.links button.empty { opacity: 0.4; }
 .links button:hover {
   transform: scale(1.2);
   transition: transform 0.15s ease-in-out;
 }
+
+/* Tombol kecil di kolom aksi */
+td:nth-child(6) button {
+  background: #eee;
+  border: 1px solid #bbb;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+td:nth-child(6) button:hover { background: #e5e5e5; }

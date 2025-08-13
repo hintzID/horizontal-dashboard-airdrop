@@ -3,41 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Airdrop Tracker</title>
+  <title>Airdrop Tracker (Google Drive)</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <div class="nav">
-    <button class="tab-btn" data-tab="aktif">📋 Utama</button>
-    <button class="tab-btn" data-tab="raffle">🎟 Airdrop Raffle</button>
-    <button class="tab-btn" data-tab="selesai">✅ Airdrop Selesai</button>
-  </div>
+  <header class="topbar">
+    <div class="nav">
+      <button class="tab-btn" data-tab="aktif">📋 Utama</button>
+      <button class="tab-btn" data-tab="raffle">🎟 Airdrop Raffle</button>
+      <button class="tab-btn" data-tab="selesai">✅ Airdrop Selesai</button>
+    </div>
 
-  <div id="aktif" class="tab-content">
+    <div class="auth">
+      <span id="auth-status">Belum login</span>
+      <button id="btn-login">Login Google</button>
+      <button id="btn-logout" style="display:none;">Logout</button>
+      <button id="btn-load" style="display:none;">🔽 Muat dari Drive</button>
+      <button id="btn-save" style="display:none;">💾 Simpan ke Drive</button>
+    </div>
+  </header>
+
+  <!-- Tab Utama -->
+  <section id="aktif" class="tab-content">
     <div class="actions">
       <button onclick="addRow('aktif')">➕ Tambah Data</button>
       <button onclick="resetChecklist('aktif')">🔄 Reset Checklist</button>
     </div>
     <div class="table-container"></div>
-  </div>
+  </section>
 
-  <div id="raffle" class="tab-content">
+  <!-- Tab Raffle -->
+  <section id="raffle" class="tab-content">
     <div class="actions">
       <button onclick="addRow('raffle')">➕ Tambah Data</button>
       <button onclick="resetChecklist('raffle')">🔄 Reset Checklist</button>
     </div>
     <div class="table-container"></div>
-  </div>
+  </section>
 
-  <div id="selesai" class="tab-content">
+  <!-- Tab Selesai -->
+  <section id="selesai" class="tab-content">
     <div class="actions">
       <button disabled>➕ Tambah Data</button>
       <button disabled>🔄 Reset Checklist</button>
     </div>
     <div class="table-container"></div>
-  </div>
+  </section>
 
+  <script src="https://apis.google.com/js/api.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
