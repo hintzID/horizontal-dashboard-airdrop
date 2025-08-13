@@ -1,76 +1,43 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<title>Airdrop Tracker</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Airdrop Tracker</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<h2>Airdrop Tracker</h2>
-
-<div class="tabs">
-  <button class="tab-btn" data-tab="aktif">Airdrop Aktif</button>
-  <button class="tab-btn" data-tab="selesai">Airdrop Selesai</button>
-  <button class="tab-btn" data-tab="raffle">Airdrop Raffle</button>
-</div>
-
-<div class="tab-content" id="aktif">
-  <div class="toolbar">
-  <button onclick="addRow('aktif')">Tambah Data</button>
-  <button onclick="resetChecklist('aktif')">Reset Checklist</button>
+  <div class="nav">
+    <button class="tab-btn" data-tab="aktif">📋 Utama</button>
+    <button class="tab-btn" data-tab="raffle">🎟 Airdrop Raffle</button>
+    <button class="tab-btn" data-tab="selesai">✅ Airdrop Selesai</button>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nama Airdrop</th>
-        <th>Deskripsi</th>
-        <th>Link</th>
-        <th>✓</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
 
-<div class="tab-content" id="selesai">
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nama Airdrop</th>
-        <th>Deskripsi</th>
-        <th>Link</th>
-        <th>✓</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+  <div id="aktif" class="tab-content">
+    <div class="actions">
+      <button onclick="addRow('aktif')">➕ Tambah Data</button>
+      <button onclick="resetChecklist('aktif')">🔄 Reset Checklist</button>
+    </div>
+    <div class="table-container"></div>
+  </div>
 
-<div class="tab-content" id="raffle">
-  <div class="toolbar">
-  <button onclick="addRow('raffle')">Tambah Data</button>
-  <button onclick="resetChecklist('raffle')">Reset Checklist</button>
-</div>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Nama Airdrop</th>
-        <th>Deskripsi</th>
-        <th>Link</th>
-        <th>✓</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+  <div id="raffle" class="tab-content">
+    <div class="actions">
+      <button onclick="addRow('raffle')">➕ Tambah Data</button>
+      <button onclick="resetChecklist('raffle')">🔄 Reset Checklist</button>
+    </div>
+    <div class="table-container"></div>
+  </div>
 
-<script src="script.js"></script>
+  <div id="selesai" class="tab-content">
+    <div class="actions">
+      <button disabled>➕ Tambah Data</button>
+      <button disabled>🔄 Reset Checklist</button>
+    </div>
+    <div class="table-container"></div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
