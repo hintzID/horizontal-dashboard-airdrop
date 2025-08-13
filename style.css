@@ -1,60 +1,66 @@
+/* Reset dasar */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
-  margin: 0;
-  padding: 0;
+  padding: 10px;
 }
 
+/* Navigasi tab */
 .nav {
-  background: #222;
-  padding: 5px;
   display: flex;
   gap: 5px;
-  align-items: center;
+  margin-bottom: 10px;
 }
 
 .nav button {
-  background: #444;
-  color: white;
+  padding: 8px 14px;
   border: none;
-  padding: 8px 12px;
   cursor: pointer;
-  border-radius: 4px;
-}
-
-.nav button.active {
-  background: #0088ff;
-}
-
-.google-login {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-#googleSignInBtn {
-  background: white;
-  color: #444;
-  border: 1px solid #ccc;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+  background: #ddd;
+  border-radius: 5px;
   font-weight: bold;
 }
 
-#googleSignInBtn:hover {
-  background: #f0f0f0;
+.nav button.active {
+  background: #4285F4;
+  color: white;
 }
 
-#userInfo {
-  color: #fff;
-  font-size: 14px;
+/* Login */
+.login-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
+#g_id_onload,
+.g_id_signin {
+  display: inline-block;
+}
+
+#user-name {
+  font-weight: bold;
+}
+
+#logout-btn {
+  padding: 5px 10px;
+  border: none;
+  background: crimson;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Konten */
 .tab-content {
   display: none;
-  padding: 10px;
 }
 
 .tab-content.active {
@@ -62,83 +68,54 @@ body {
 }
 
 .actions {
+  display: flex;
+  gap: 5px;
   margin-bottom: 10px;
 }
 
 .actions button {
-  background: #0088ff;
-  color: white;
+  padding: 5px 10px;
   border: none;
-  padding: 6px 10px;
-  margin-right: 5px;
+  background: #007bff;
+  color: white;
+  border-radius: 5px;
   cursor: pointer;
-  border-radius: 4px;
 }
 
 .actions button[disabled] {
-  background: #ccc;
+  background: #aaa;
   cursor: not-allowed;
 }
 
+/* Tabel */
 .table-container {
   overflow-x: auto;
 }
 
 table {
-  border-collapse: collapse;
   width: 100%;
+  border-collapse: collapse;
   background: white;
 }
 
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 6px;
+th, td {
+  border: 1px solid #ccc;
+  padding: 5px;
   text-align: left;
+  font-size: 14px;
 }
 
-td[contenteditable="true"] {
-  background: #f9f9f9;
+th {
+  background: #eee;
 }
 
-/* Lebar kolom yang di-press */
-th:nth-child(4),
-td:nth-child(4) {
-  width: 100px;
-  text-align: center;
-  white-space: nowrap;
+/* Kolom kecil */
+th:nth-child(3),
+td:nth-child(3) {
+  width: 200px; /* Link */
 }
 
 th:nth-child(5),
 td:nth-child(5) {
-  width: 80px;
-  text-align: center;
-  white-space: nowrap;
-}
-
-th:nth-child(6),
-td:nth-child(6) {
-  width: 90px;
-  text-align: center;
-  white-space: nowrap;
-  padding: 4px 6px;
-}
-
-.links button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  margin: 0 3px;
-  padding: 2px 5px;
-  vertical-align: middle;
-  line-height: 1;
-}
-
-.links button.empty {
-  opacity: 0.4;
-}
-
-.links button:hover {
-  transform: scale(1.2);
+  width: 100px; /* Aksi */
 }

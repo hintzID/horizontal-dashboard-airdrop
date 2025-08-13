@@ -1,38 +1,51 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Horizontal ARDP</title>
+  <title>HorizontalARDP</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-
 <body>
+  <!-- Navigasi -->
   <div class="nav">
     <button data-tab="utama" class="active">Airdrop Utama</button>
     <button data-tab="raffle">Airdrop Raffle</button>
     <button data-tab="selesai">Airdrop Selesai</button>
-    <div class="google-login">
-      <button id="googleSignInBtn">🔑 Login Google</button>
-      <span id="userInfo"></span>
-    </div>
   </div>
 
-  <!-- Tab Utama -->
+  <!-- Tombol login -->
+  <div class="login-container">
+    <div id="g_id_onload"
+         data-client_id="123146255469-kbddr3ni88jj9i92b3hjjg32os13qn3j.apps.googleusercontent.com"
+         data-auto_prompt="false"
+         data-callback="handleCredentialResponse">
+    </div>
+    <div class="g_id_signin"
+         data-type="standard"
+         data-size="large"
+         data-theme="filled_blue"
+         data-text="signin_with"
+         data-shape="rectangular"
+         data-logo_alignment="left">
+    </div>
+    <span id="user-name"></span>
+    <button id="logout-btn" style="display:none;">Logout</button>
+  </div>
+
+  <!-- Konten -->
   <div id="utama" class="tab-content active">
     <div class="actions">
-      <button id="addDataUtama">Tambah Data</button>
-      <button id="resetChecklistUtama">Reset Checklist</button>
+      <button id="add-data-utama">Tambah Data</button>
+      <button id="reset-checklist-utama">Reset Checklist</button>
     </div>
     <div class="table-container">
-      <table id="tableUtama">
+      <table id="table-utama">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Catatan</th>
-            <th>Deadline</th>
+            <th>Keterangan</th>
             <th>Link</th>
             <th>Checklist</th>
             <th>Aksi</th>
@@ -43,19 +56,17 @@
     </div>
   </div>
 
-  <!-- Tab Raffle -->
   <div id="raffle" class="tab-content">
     <div class="actions">
-      <button id="addDataRaffle">Tambah Data</button>
-      <button id="resetChecklistRaffle">Reset Checklist</button>
+      <button id="add-data-raffle">Tambah Data</button>
+      <button id="reset-checklist-raffle">Reset Checklist</button>
     </div>
     <div class="table-container">
-      <table id="tableRaffle">
+      <table id="table-raffle">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Catatan</th>
-            <th>Deadline</th>
+            <th>Keterangan</th>
             <th>Link</th>
             <th>Checklist</th>
             <th>Aksi</th>
@@ -66,19 +77,17 @@
     </div>
   </div>
 
-  <!-- Tab Selesai -->
   <div id="selesai" class="tab-content">
     <div class="actions">
-      <button id="addDataSelesai" disabled>Tambah Data</button>
-      <button id="resetChecklistSelesai" disabled>Reset Checklist</button>
+      <button id="add-data-selesai" disabled>Tambah Data</button>
+      <button id="reset-checklist-selesai" disabled>Reset Checklist</button>
     </div>
     <div class="table-container">
-      <table id="tableSelesai">
+      <table id="table-selesai">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Catatan</th>
-            <th>Deadline</th>
+            <th>Keterangan</th>
             <th>Link</th>
             <th>Checklist</th>
             <th>Aksi</th>
@@ -91,5 +100,4 @@
 
   <script src="script.js"></script>
 </body>
-
 </html>
