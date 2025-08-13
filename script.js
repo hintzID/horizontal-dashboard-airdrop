@@ -1,21 +1,21 @@
 /***********************
- *  A. KONFIGURASI GAPI
+ *  A. KONFIGURASI GIS
  ***********************/
 const GOOGLE_CLIENT_ID = "123146255469-vs68gm9qurlc2ej29kq091qm13bisf6b.apps.googleusercontent.com";
-const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file"; // akses file yg dibuat app
+const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
+const OIDC_SCOPES = "openid email profile"; // supaya bisa tampilkan email user
+const ALL_SCOPES = `${DRIVE_SCOPE} ${OIDC_SCOPES}`;
 const DRIVE_DISCOVERY = "https://www.googleapis.com/discovery/v1/apis/drive/v3/rest";
-
-// Nama file di Google Drive
 const DRIVE_FILENAME = "airdrop_tracker_data.json";
 
 let isSignedIn = false;
-let driveFileId = null; // diset setelah ditemukan/dibuat
 let accessToken = null;
+let driveFileId = null;
+let tokenClient = null;
 
 /*****************************************
  *  B. DATA & RENDER TABEL (Airdrop App)
  *****************************************/
-const storages = { aktif: "airdropData", raffle: "airdropRaffle", selesai: "airdropDone" }; // label kategori
 let dataMap = { aktif: [], raffle: [], selesai: [] };
 
 function defaultEmptyRow() {
@@ -45,7 +45,7 @@ function createLinkButton(type, index, key, label, emoji) {
     const newUrl = prompt(`Masukkan Link ${label}:`, current);
     if (newUrl !== null) {
       dataMap[type][index].links[key] = newUrl.trim();
-      renderTable(type); // re-render biar kelas .empty update
+      renderTable(type);
     }
   };
   return btn;
@@ -71,7 +71,7 @@ function renderTable(type) {
   const tbody = table.querySelector("tbody");
 
   dataMap[type].forEach((row, i) => {
-    if (!row.links) row.links = defaultEmptyRow().links; // guard
+    if (!row.links) row.links = defaultEmptyRow().links;
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${i + 1}</td>
@@ -82,21 +82,18 @@ function renderTable(type) {
       <td></td>
     `;
 
-    // Edit handlers
     tr.cells[1].oninput = () => { row.nama = tr.cells[1].innerText.trim(); };
     tr.cells[2].oninput = () => { row.deskripsi = tr.cells[2].innerText.trim(); };
     tr.cells[4].querySelector("input").onchange = (e) => { row.checklist = e.target.checked; };
 
-    // Link buttons (urutan sesuai request)
     const linksCell = tr.cells[3];
     linksCell.appendChild(createLinkButton(type, i, "main",     "Link Utama", "🔗"));
-    linksCell.appendChild(createLinkButton(type, i, "discord",  "Discord",    "🟣")); // placeholder ungu
+    linksCell.appendChild(createLinkButton(type, i, "discord",  "Discord",    "🟣"));
     linksCell.appendChild(createLinkButton(type, i, "x",        "X / Twitter","𝕏"));
     linksCell.appendChild(createLinkButton(type, i, "telegram", "Telegram",   "📨"));
     linksCell.appendChild(createLinkButton(type, i, "custom1",  "Custom 1",   "🌐"));
     linksCell.appendChild(createLinkButton(type, i, "custom2",  "Custom 2",   "📄"));
 
-    // Aksi
     const aksiCell = tr.cells[5];
     if (type === "aktif" || type === "raffle") {
       const doneBtn = document.createElement("button");
@@ -143,15 +140,15 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     document.getElementById(btn.dataset.tab).classList.add("active");
   };
 });
-// default tab
+
 window.addEventListener("DOMContentLoaded", () => {
   document.querySelector(".tab-btn[data-tab='aktif']").click();
 });
 
 /***************************************
- *  D. GOOGLE AUTH + DRIVE INTEGRATION
+ *  D. GOOGLE IDENTITY + DRIVE (GIS)
  ***************************************/
-function updateAuthUI() {
+function updateAuthUI(email = null) {
   const status = document.getElementById("auth-status");
   const btnLogin = document.getElementById("btn-login");
   const btnLogout = document.getElementById("btn-logout");
@@ -159,9 +156,7 @@ function updateAuthUI() {
   const btnSave = document.getElementById("btn-save");
 
   if (isSignedIn) {
-    const user = gapi.auth2.getAuthInstance().currentUser.get();
-    const profile = user.getBasicProfile();
-    status.textContent = `Login: ${profile.getEmail()}`;
+    status.textContent = email ? `Login: ${email}` : "Login: Terhubung";
     btnLogin.style.display = "none";
     btnLogout.style.display = "";
     btnLoad.style.display = "";
@@ -175,99 +170,70 @@ function updateAuthUI() {
   }
 }
 
-async function initGapi() {
+async function initApis() {
+  // Load GAPI Client + Drive discovery
   return new Promise((resolve) => {
-    gapi.load("client:auth2", async () => {
-      await gapi.client.init({
-        clientId: GOOGLE_CLIENT_ID,
-        scope: DRIVE_SCOPE,
-        discoveryDocs: [DRIVE_DISCOVERY],
-      });
-      const auth = gapi.auth2.getAuthInstance();
-      isSignedIn = auth.isSignedIn.get();
-      auth.isSignedIn.listen((val) => {
-        isSignedIn = val;
-        accessToken = isSignedIn
-          ? auth.currentUser.get().getAuthResponse().access_token
-          : null;
-        updateAuthUI();
-        if (isSignedIn) ensureDriveFile().then(loadFromDrive);
-      });
-      if (isSignedIn) {
-        accessToken = auth.currentUser.get().getAuthResponse().access_token;
-        await ensureDriveFile();
-        await loadFromDrive();
-      }
-      updateAuthUI();
+    gapi.load("client", async () => {
+      await gapi.client.init({ discoveryDocs: [DRIVE_DISCOVERY] });
       resolve();
     });
   });
 }
 
-async function signIn() {
-  await gapi.auth2.getAuthInstance().signIn();
+async function fetchUserInfo() {
+  if (!accessToken) return null;
+  const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+  if (!res.ok) return null;
+  return res.json();
 }
-async function signOut() {
-  await gapi.auth2.getAuthInstance().signOut();
-  driveFileId = null;
-}
 
-document.getElementById("btn-login").addEventListener("click", signIn);
-document.getElementById("btn-logout").addEventListener("click", signOut);
-document.getElementById("btn-load").addEventListener("click", () => loadFromDrive(true));
-document.getElementById("btn-save").addEventListener("click", saveToDrive);
-
-// Panggil init saat API JS sudah siap
-window.addEventListener("load", initGapi);
-
-/****************************************
- *  E. DRIVE HELPERS (find/create/save)
- ****************************************/
-async function ensureDriveFile() {
-  // Cari file berdasar nama
-  const query = `name='${DRIVE_FILENAME}' and trashed=false`;
+async function ensureDriveReady() {
+  // Pastikan file JSON ada; kalau belum ada, buat dengan data kosong
   const res = await gapi.client.drive.files.list({
-    q: query,
+    q: `name='${DRIVE_FILENAME}' and trashed=false`,
     fields: "files(id,name)",
     pageSize: 1,
   });
 
-  if (res.result.files && res.result.files.length > 0) {
+  if (res?.result?.files?.length > 0) {
     driveFileId = res.result.files[0].id;
     return driveFileId;
   }
 
-  // Buat file baru jika belum ada
+  // Buat file baru berisi objek kosong
   const initialData = { aktif: [], raffle: [], selesai: [] };
-  const createdId = await createOrUpdateFileMultipart(null, initialData);
-  driveFileId = createdId;
+  driveFileId = await createOrUpdateFileMultipart(null, initialData);
   return driveFileId;
 }
 
 async function loadFromDrive(showAlert = false) {
-  if (!isSignedIn) { alert("Login dulu."); return; }
-  await ensureDriveFile();
+  if (!isSignedIn || !accessToken) { alert("Login dulu."); return; }
+  await ensureDriveReady();
+
   const resp = await fetch(
     `https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,
-    { headers: { Authorization: `Bearer ${gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token}` } }
+    { headers: { Authorization: `Bearer ${accessToken}` } }
   );
   if (!resp.ok) {
     alert("Gagal memuat data dari Drive.");
     return;
   }
   const json = await resp.json();
-  // Validasi & merge minimal
+
   ["aktif","raffle","selesai"].forEach(t => {
     dataMap[t] = Array.isArray(json[t]) ? json[t] : [];
   });
-  // Render ulang
+
   ["aktif","raffle","selesai"].forEach(renderTable);
   if (showAlert) alert("Data dimuat dari Google Drive.");
 }
 
 async function saveToDrive() {
-  if (!isSignedIn) { alert("Login dulu."); return; }
-  await ensureDriveFile();
+  if (!isSignedIn || !accessToken) { alert("Login dulu."); return; }
+  await ensureDriveReady();
+
   const payload = {
     aktif: dataMap.aktif,
     raffle: dataMap.raffle,
@@ -277,7 +243,58 @@ async function saveToDrive() {
   alert("Data tersimpan ke Google Drive.");
 }
 
-// Multipart upload (create jika id null, else update)
+/****************************************
+ *  E. LOGIN/LOGOUT & TOKEN MANAGEMENT
+ ****************************************/
+async function initIdentity() {
+  await initApis();
+
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: ALL_SCOPES,
+    callback: async (tokenResponse) => {
+      accessToken = tokenResponse.access_token || null;
+      if (!accessToken) {
+        isSignedIn = false;
+        updateAuthUI();
+        return;
+      }
+      gapi.client.setToken({ access_token: accessToken });
+      isSignedIn = true;
+
+      // Tampilkan email user (opsional)
+      const user = await fetchUserInfo();
+      updateAuthUI(user?.email || null);
+
+      // Auto ensure & load
+      await ensureDriveReady();
+      await loadFromDrive(false);
+    }
+  });
+
+  updateAuthUI();
+}
+
+function signIn() {
+  // prompt: 'consent' memaksa dialog pertama kali; setelah itu bisa kosong untuk silent refresh
+  tokenClient.requestAccessToken({ prompt: "consent" });
+}
+
+function signOut() {
+  if (accessToken) {
+    // Revoke token agar benar-benar logout dari app ini
+    google.accounts.oauth2.revoke(accessToken, () => {});
+  }
+  accessToken = null;
+  gapi.client.setToken(null);
+  isSignedIn = false;
+  driveFileId = null;
+  updateAuthUI();
+}
+
+/****************************************
+ *  F. MULTIPART UPLOAD (CREATE/UPDATE)
+ ****************************************/
 async function createOrUpdateFileMultipart(fileId, jsonObj) {
   const metadata = {
     name: DRIVE_FILENAME,
@@ -301,12 +318,10 @@ async function createOrUpdateFileMultipart(fileId, jsonObj) {
     ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart`
     : `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`;
 
-  const token = gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token;
-
   const res = await fetch(url, {
     method,
     headers: {
-      "Authorization": `Bearer ${token}`,
+      "Authorization": `Bearer ${accessToken}`,
       "Content-Type": `multipart/related; boundary=${boundary}`,
     },
     body,
@@ -322,3 +337,14 @@ async function createOrUpdateFileMultipart(fileId, jsonObj) {
   const out = await res.json();
   return out.id;
 }
+
+/********************************
+ *  G. HOOK TOMBOL & INISIALISASI
+ ********************************/
+document.getElementById("btn-login").addEventListener("click", signIn);
+document.getElementById("btn-logout").addEventListener("click", signOut);
+document.getElementById("btn-load").addEventListener("click", () => loadFromDrive(true));
+document.getElementById("btn-save").addEventListener("click", saveToDrive);
+
+// Mulai begitu halaman selesai load (GIS script async)
+window.addEventListener("load", initIdentity);
