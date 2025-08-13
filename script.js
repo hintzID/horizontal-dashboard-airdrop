@@ -1,5 +1,5 @@
 // ===== KONFIGURASI GOOGLE API =====
-const CLIENT_ID = "123146255469-vs68gm9qurlc2ej29kq091qm13bisf6b.apps.googleusercontent.com";
+const CLIENT_ID = "123146255469-kbddr3ni88jj9i92b3hjjg32os13qn3j.apps.googleusercontent.com";
 const API_KEY = ""; // Bisa dikosongkan kalau cuma OAuth
 const SCOPES = "https://www.googleapis.com/auth/drive.file";
 
