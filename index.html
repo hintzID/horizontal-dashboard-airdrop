@@ -1,104 +1,144 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HorizontalARDP</title>
-  <link rel="stylesheet" href="style.css">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://apis.google.com/js/api.js" async defer onload="gapiLoaded()"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Airdrop Tracker — Local Storage</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Navigasi -->
-  <div class="nav">
-    <button data-tab="utama" class="active">Airdrop Utama</button>
-    <button data-tab="raffle">Airdrop Raffle</button>
-    <button data-tab="selesai">Airdrop Selesai</button>
-  </div>
 
-  <!-- Tombol login -->
-  <div class="login-container">
-    <div id="g_id_onload"
-         data-client_id="123146255469-kbddr3ni88jj9i92b3hjjg32os13qn3j.apps.googleusercontent.com"
-         data-auto_prompt="false"
-         data-callback="handleCredentialResponse">
-    </div>
-    <div class="g_id_signin"
-         data-type="standard"
-         data-size="large"
-         data-theme="filled_blue"
-         data-text="signin_with"
-         data-shape="rectangular"
-         data-logo_alignment="left">
-    </div>
-    <span id="user-name"></span>
-    <button id="logout-btn" style="display:none;">Logout</button>
+<header class="topbar">
+  <div class="nav" role="navigation" aria-label="tabs">
+    <button class="tab-btn active" data-tab="aktif">
+      <i class="fas fa-clipboard-list"></i> Utama
+    </button>
+    <button class="tab-btn" data-tab="raffle">
+      <i class="fas fa-ticket-alt"></i> Raffle
+    </button>
+    <button class="tab-btn" data-tab="selesai">
+      <i class="fas fa-check-circle"></i> Selesai
+    </button>
   </div>
+</header>
 
-  <!-- Konten -->
-  <div id="utama" class="tab-content active">
-    <div class="actions">
-      <button id="add-data-utama">Tambah Data</button>
-      <button id="reset-checklist-utama">Reset Checklist</button>
+<main class="container">
+  <!-- Aktif -->
+  <section id="aktif" class="tab-content active">
+    <div class="header-actions">
+      <h2>Airdrop Aktif</h2>
+      <div class="actions">
+        <button id="add-aktif" class="btn-primary">
+          <i class="fas fa-plus"></i> Tambah Data
+        </button>
+        <button id="reset-aktif" class="btn-secondary">
+          <i class="fas fa-redo"></i> Reset Checklist
+        </button>
+      </div>
     </div>
+    
     <div class="table-container">
-      <table id="table-utama">
+      <table id="table-aktif">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Keterangan</th>
-            <th>Link</th>
-            <th>Checklist</th>
+            <th>Deskripsi</th>
+            <th>Status</th>
+            <th>Links</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-  </div>
+  </section>
 
-  <div id="raffle" class="tab-content">
-    <div class="actions">
-      <button id="add-data-raffle">Tambah Data</button>
-      <button id="reset-checklist-raffle">Reset Checklist</button>
+  <!-- Raffle -->
+  <section id="raffle" class="tab-content">
+    <div class="header-actions">
+      <h2>Airdrop Raffle</h2>
+      <div class="actions">
+        <button id="add-raffle" class="btn-primary">
+          <i class="fas fa-plus"></i> Tambah Data
+        </button>
+        <button id="reset-raffle" class="btn-secondary">
+          <i class="fas fa-redo"></i> Reset Checklist
+        </button>
+      </div>
     </div>
+    
     <div class="table-container">
       <table id="table-raffle">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Keterangan</th>
-            <th>Link</th>
-            <th>Checklist</th>
+            <th>Deskripsi</th>
+            <th>Status</th>
+            <th>Links</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-  </div>
+  </section>
 
-  <div id="selesai" class="tab-content">
-    <div class="actions">
-      <button id="add-data-selesai" disabled>Tambah Data</button>
-      <button id="reset-checklist-selesai" disabled>Reset Checklist</button>
+  <!-- Selesai -->
+  <section id="selesai" class="tab-content">
+    <div class="header-actions">
+      <h2>Airdrop Selesai</h2>
+      <div class="actions">
+        <button disabled class="btn-disabled">
+          <i class="fas fa-plus"></i> Tambah Data
+        </button>
+        <button disabled class="btn-disabled">
+          <i class="fas fa-redo"></i> Reset Checklist
+        </button>
+      </div>
     </div>
+    
     <div class="table-container">
       <table id="table-selesai">
         <thead>
           <tr>
             <th>Nama</th>
-            <th>Keterangan</th>
-            <th>Link</th>
-            <th>Checklist</th>
+            <th>Deskripsi</th>
+            <th>Status</th>
+            <th>Links</th>
             <th>Aksi</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-  </div>
+  </section>
+</main>
 
-  <script src="script.js"></script>
+<!-- Link Editor Modal -->
+<div id="link-modal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Edit Tautan</h3>
+    <div class="form-group">
+      <label for="link-type">Jenis Tautan:</label>
+      <select id="link-type">
+        <option value="main">Situs Utama</option>
+        <option value="discord">Discord</option>
+        <option value="x">Twitter/X</option>
+        <option value="telegram">Telegram</option>
+        <option value="custom1">Tautan Kustom 1</option>
+        <option value="custom2">Tautan Kustom 2</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="link-url">URL:</label>
+      <input type="url" id="link-url" placeholder="https://example.com">
+    </div>
+    <button id="save-link" class="btn-primary">Simpan</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
