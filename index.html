@@ -1,59 +1,102 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Airdrop Tracker (Google Drive)</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airdrop Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-
-  <header class="topbar">
+  <!-- Top Bar -->
+  <div class="topbar">
     <div class="nav">
-      <button class="tab-btn" data-tab="aktif">📋 Utama</button>
-      <button class="tab-btn" data-tab="raffle">🎟 Airdrop Raffle</button>
-      <button class="tab-btn" data-tab="selesai">✅ Airdrop Selesai</button>
+      <button data-tab="utama" class="active">Utama</button>
+      <button data-tab="raffle">Airdrop Raffle</button>
+      <button data-tab="selesai">Airdrop Selesai</button>
     </div>
-
     <div class="auth">
-      <span id="auth-status">Belum login</span>
-      <button id="btn-login">Login Google</button>
-      <button id="btn-logout" style="display:none;">Logout</button>
-      <button id="btn-load" style="display:none;">🔽 Muat dari Drive</button>
-      <button id="btn-save" style="display:none;">💾 Simpan ke Drive</button>
+      <div id="g_id_onload"
+        data-client_id="ISI_CLIENT_ID_ANDA"
+        data-context="signin"
+        data-ux_mode="popup"
+        data-callback="handleCredentialResponse"
+        data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin" data-type="standard"></div>
+      <span class="status" id="loginStatus">Belum login</span>
     </div>
-  </header>
+  </div>
 
-  <!-- Tab Utama -->
-  <section id="aktif" class="tab-content">
+  <!-- Tab: Utama -->
+  <div id="utama" class="tab-content active">
     <div class="actions">
-      <button onclick="addRow('aktif')">➕ Tambah Data</button>
-      <button onclick="resetChecklist('aktif')">🔄 Reset Checklist</button>
+      <button id="addDataUtama">Tambah Data</button>
+      <button id="resetChecklistUtama">Reset Checklist</button>
     </div>
-    <div class="table-container"></div>
-  </section>
+    <div class="table-container">
+      <table id="tableUtama">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Deskripsi</th>
+            <th>Checklist</th>
+            <th>Links</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
-  <!-- Tab Raffle -->
-  <section id="raffle" class="tab-content">
+  <!-- Tab: Raffle -->
+  <div id="raffle" class="tab-content">
     <div class="actions">
-      <button onclick="addRow('raffle')">➕ Tambah Data</button>
-      <button onclick="resetChecklist('raffle')">🔄 Reset Checklist</button>
+      <button id="addDataRaffle">Tambah Data</button>
+      <button id="resetChecklistRaffle">Reset Checklist</button>
     </div>
-    <div class="table-container"></div>
-  </section>
+    <div class="table-container">
+      <table id="tableRaffle">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Deskripsi</th>
+            <th>Checklist</th>
+            <th>Links</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
-  <!-- Tab Selesai -->
-  <section id="selesai" class="tab-content">
+  <!-- Tab: Selesai -->
+  <div id="selesai" class="tab-content">
     <div class="actions">
-      <button disabled>➕ Tambah Data</button>
-      <button disabled>🔄 Reset Checklist</button>
+      <button id="addDataSelesai" disabled>Tambah Data</button>
+      <button id="resetChecklistSelesai" disabled>Reset Checklist</button>
     </div>
-    <div class="table-container"></div>
-  </section>
+    <div class="table-container">
+      <table id="tableSelesai">
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Deskripsi</th>
+            <th>Checklist</th>
+            <th>Links</th>
+            <th>Tanggal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
 
-<script src="https://apis.google.com/js/api.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="script.js"></script>
-
+  <script src="script.js"></script>
 </body>
 </html>

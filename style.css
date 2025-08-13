@@ -1,4 +1,3 @@
-/* Layout dasar */
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
@@ -6,44 +5,58 @@ body {
   padding: 0;
 }
 
+/* Top Navigation & Auth */
 .topbar {
+  background: #222;
+  color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #222;
-  color: #fff;
-  padding: 6px 8px;
-  gap: 8px;
-  flex-wrap: wrap;
+  padding: 5px;
 }
 
-.nav { display: flex; gap: 5px; }
+.nav {
+  display: flex;
+  gap: 5px;
+}
+
 .nav button {
   background: #444;
   color: white;
   border: none;
   padding: 8px 12px;
   cursor: pointer;
-  border-radius: 4px;
 }
-.nav button.active { background: #0088ff; }
 
-.auth { display: flex; align-items: center; gap: 6px; }
-.auth button {
+.nav button.active {
   background: #0088ff;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  cursor: pointer;
-  border-radius: 4px;
 }
-#btn-load, #btn-save { background: #00a86b; }
-#btn-save { background: #0d6efd; }
 
-.tab-content { display: none; padding: 10px; }
-.tab-content.active { display: block; }
+.auth {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-.actions { margin: 8px 0 10px; }
+#loginStatus {
+  font-size: 14px;
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+  padding: 10px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Actions */
+.actions {
+  margin-bottom: 10px;
+}
+
 .actions button {
   background: #0088ff;
   color: white;
@@ -51,69 +64,72 @@ body {
   padding: 6px 10px;
   margin-right: 5px;
   cursor: pointer;
-  border-radius: 4px;
 }
-.actions button[disabled] { background: #ccc; cursor: not-allowed; }
 
-.table-container { overflow-x: auto; }
+.actions button[disabled] {
+  background: #ccc;
+  cursor: not-allowed;
+}
 
-/* Tabel */
+/* Table */
+.table-container {
+  overflow-x: auto;
+}
+
 table {
   border-collapse: collapse;
   width: 100%;
   background: white;
 }
+
 th, td {
   border: 1px solid #ddd;
   padding: 6px;
   text-align: left;
-  vertical-align: middle;
-}
-td[contenteditable="true"] { background: #f9f9f9; }
-
-/* Lebar kolom link/checklist/aksi: ngepres */
-th:nth-child(4), td:nth-child(4) {
-  width: 130px;              /* Links */
-  text-align: center;
-  white-space: nowrap;
-  padding: 2px 4px;
-}
-th:nth-child(5), td:nth-child(5) {
-  width: 40px;               /* Checklist */
-  text-align: center;
-  white-space: nowrap;
-  padding: 2px 4px;
-}
-th:nth-child(6), td:nth-child(6) {
-  width: 80px;               /* Aksi */
-  text-align: center;
-  white-space: nowrap;
-  padding: 2px 6px;
 }
 
-/* Tombol ikon link */
+td[contenteditable="true"] {
+  background: #f9f9f9;
+}
+
+/* Column Sizing */
+th:nth-child(3),
+td:nth-child(3) {
+  width: 60px; /* Checklist lebih ngepres */
+  text-align: center;
+}
+
+th:nth-child(4),
+td:nth-child(4) {
+  width: 140px; /* Kolom Links lebih rapat */
+  text-align: center;
+  white-space: nowrap;
+}
+
+th:nth-child(6),
+td:nth-child(6) {
+  width: 70px; /* Aksi lebih rapat */
+  text-align: center;
+  white-space: nowrap;
+  padding: 4px 6px;
+}
+
+/* Link Icons */
 .links button {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 16px;
-  margin: 0 2px;
-  padding: 1px 4px;
+  margin: 0 3px;
+  padding: 2px 5px;
   vertical-align: middle;
   line-height: 1;
 }
-.links button.empty { opacity: 0.4; }
-.links button:hover {
-  transform: scale(1.2);
-  transition: transform 0.15s ease-in-out;
+
+.links button.empty {
+  opacity: 0.4;
 }
 
-/* Tombol kecil di kolom aksi */
-td:nth-child(6) button {
-  background: #eee;
-  border: 1px solid #bbb;
-  padding: 2px 6px;
-  border-radius: 4px;
-  cursor: pointer;
+.links button:hover {
+  transform: scale(1.2);
 }
-td:nth-child(6) button:hover { background: #e5e5e5; }
